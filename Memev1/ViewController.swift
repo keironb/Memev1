@@ -13,6 +13,7 @@ import UIKit
 class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
 
     @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var memedImageContainer: UIView!
     
     let textFieldAttributes : [NSAttributedString.Key : Any] = [
         NSAttributedString.Key.strokeColor : UIColor.black,
@@ -70,7 +71,9 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     @IBAction func shareFunctionButton(_ sender: Any) {
         
-        let activityVC = UIActivityViewController(activityItems: [self.generateMemedImage()], applicationActivities: nil)
+        guard let memedImage = self.generateMemedImage() else { return }
+        
+        let activityVC = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         activityVC.popoverPresentationController?.sourceView = self.view
         self.present(activityVC, animated: true, completion: nil)
     
@@ -131,17 +134,31 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         picker.dismiss(animated: true, completion: nil)
     }
     
-    func generateMemedImage() -> UIImage {
+    func generateMemedImage() -> UIImage? {
+        
+        return memedImageContainer.asImage()
         
         // Render view to an image
-        UIGraphicsBeginImageContext(self.view.frame.size)
-        view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
-        let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        
-        return memedImage
+//        UIGraphicsBeginImageContext(memedImageContainer.frame.size)
+//        view.drawHierarchy(in: memedImageContainer.frame, afterScreenUpdates: true)
+//        let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+//        UIGraphicsEndImageContext()
+//
+//        return memedImage
     }
     
 }
 
+extension UIView {
+    
+    func asImage() -> UIImage? {
+        
+        UIGraphicsBeginImageContext(frame.size)
+        layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image
+    }
+}
 
